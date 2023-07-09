@@ -1,0 +1,33 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --device "MSP432P401R" --package "PZ100" --part "Default"
+ * @versions {"tool":"1.16.2+3028"}
+ */
+
+/**
+ * These are the peripherals and settings in this configuration
+ */
+const iGPIO1                = scripting.addPeripheral("GPIO");
+iGPIO1["0"]["i/o_pu/pd"]    = "GPIO_CFG_OUT_STD";
+iGPIO1["0"].output_value    = "GPIO_CFG_OUT_HIGH";
+iGPIO1["0"].output_strength = "GPIO_CFG_OUT_STR_LOW";
+iGPIO1["0"].$assign         = "P1.0.GPIO/EUSCI_A0_SPI.STE";
+iGPIO1.$name                = "MyGPIO1";
+const iSYSTEM1              = scripting.addPeripheral("SYSTEM");
+iSYSTEM1.$name              = "SYSTEM";
+const iTIMER_A1             = scripting.addPeripheral("TIMER_A");
+iTIMER_A1.$useCase          = "104_usecase_101";
+iTIMER_A1.$name             = "MyTIMER_A1";
+iTIMER_A1.$assign           = "Timer_A0";
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+iSYSTEM1.$suggestSolution        = "SYSTEM";
+iSYSTEM1.ACLK.$suggestSolution   = "P4.2.GPIO/CS.ACLK/Timer_A2.CLK/ADC14.A11";
+iSYSTEM1.MCLK.$suggestSolution   = "P4.3.GPIO/CS.MCLK/RTC_C.CLK/ADC14.A10";
+iSYSTEM1.HSMCLK.$suggestSolution = "P4.4.GPIO/CS.HSMCLK/ADC14.A9";
+iSYSTEM1.SMCLK.$suggestSolution  = "P2.0.GPIO/EUSCI_A1_SPI.STE";
