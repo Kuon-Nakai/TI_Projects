@@ -71,7 +71,7 @@ inline void DMA_Init(uint32_t channelPeriph, uint8_t channel, uint32_t control, 
     MAP_DMA_enableChannel(channel);
 }
 
-inline void DMA_Module_Enable() {
+void DMA_Module_Enable() {
     MAP_DMA_enableModule();
     MAP_DMA_setControlBase(DMAControlTable);
 }
