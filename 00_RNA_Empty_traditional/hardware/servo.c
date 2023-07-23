@@ -2,7 +2,7 @@
  * @file servo.c
  * @author Shiki
  * @brief 双路舵机控制模块，适用于舵机云台
- * @version 1.0
+ * @version 1.1
  * @date 2023-07-09
  * 
  * @note 用于MSP432P401R LaunchPad开发板
@@ -63,6 +63,8 @@ ServoControl2 *ServoControl2_init(uint16_t freq, uint32_t TimBase, uint32_t ACh,
  * @param angle Desired azimuth angle
  */
 void ServoControl2_setAzimuth(ServoControl2 *sc, float angle){
+    if(angle > sc->Amax) angle = sc->Amax;
+    else if(angle < sc->Amin) angle = sc->Amin;
     uint16_t ccr = (uint16_t)(sc->ACompensation + sc->AMultiplier * angle);
     Timer_A_setCompareValue(sc->TimBase, sc->ATimCh, ccr);
 #if DEBUG
@@ -78,6 +80,8 @@ void ServoControl2_setAzimuth(ServoControl2 *sc, float angle){
  * @param angle Desired elevation angle
  */
 void ServoControl2_setElevation(ServoControl2 *sc, float angle){
+    if(angle > sc->Emax) angle = sc->Emax;
+    else if(angle < sc->Emin) angle = sc->Emin;
     uint16_t ccr = (uint16_t)(sc->ECompensation + sc->EMultiplier * angle);
     Timer_A_setCompareValue(sc->TimBase, sc->ETimCh, ccr);
 #if DEBUG
@@ -130,3 +134,18 @@ void ServoControl2_setParams(ServoControl2 *sc, uint16_t ac, uint16_t ec, float 
     sc->EMultiplier = em;
 }
 
+/**
+ * @brief Set the limits of the servo control group to prevent damage to servos.
+ *
+ * @param sc    ServoControl2 type struct
+ * @param amin  Minimum azimuth angle
+ * @param amax  Maximum azimuth angle
+ * @param emin  Minimum elevation angle
+ * @param emax  Maximum elevation angle
+ */
+void ServoControl2_setLimits(ServoControl2 *sc, float amin, float amax, float emin, float emax) {
+    sc->Amin = amin;
+    sc->Amax = amax;
+    sc->Emin = emin;
+    sc->Emax = emax;
+}

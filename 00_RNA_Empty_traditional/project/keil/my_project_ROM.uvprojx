@@ -458,6 +458,26 @@
               <FileType>1</FileType>
               <FilePath>..\..\hardware\servo.c</FilePath>
             </File>
+            <File>
+              <FileName>PID.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\PID.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>HAL_I2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\HAL_I2C.c</FilePath>
+            </File>
+            <File>
+              <FileName>GPIO_Setup.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\hardware\inc\GPIO_Setup.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

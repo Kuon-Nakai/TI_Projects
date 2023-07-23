@@ -55,6 +55,7 @@
 #include "baudrate_calculate.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #ifdef __TI_COMPILER_VERSION__
 //CCS平台
@@ -126,7 +127,16 @@ int fputc(int ch, FILE *f)
  *****************   说明结束   *****************/
 #endif
 
-void uart_init(uint32_t baudRate)
+/**
+ * @brief Initialize specified EUSCI_A module for UART operation.
+ * 
+ * @param UCA_Module  EUSCI_A module. Valid parameters: - EUSCI_A0_BASE - EUSCI_A1_BASE - EUSCI_A2_BASE - EUSCI_A3_BASE
+ * @param baudRate    Baud rate for UART communication.
+ * 
+ * @note              EUSCI_A0 can be connected using the on-board debugger, A1 and A2 is connected to CH340 USB-C port on the Connections Extension board. Note that the RX of A1
+ *                    has to be manually connected to the TTL pin 3/4 since it's not available using boosterpack standard connection.
+ */
+void uart_init(uint32_t UCA_Module, uint32_t baudRate)
 {
 #ifdef EUSCI_A_UART_7_BIT_LEN
   //固件库v3_40_01_02
@@ -163,19 +173,19 @@ void uart_init(uint32_t baudRate)
   eusci_calcBaudDividers((eUSCI_UART_Config *)&uartConfig, baudRate); //配置波特率
 #endif
 
-  MAP_GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION);
-  MAP_UART_initModule(EUSCI_A0_BASE, &uartConfig);
-  MAP_UART_enableModule(EUSCI_A0_BASE);
+  MAP_UART_initModule(UCA_Module, &uartConfig);
+  MAP_UART_enableModule(UCA_Module);
 }
 
 /**
  * @brief Initialize EUSCI_A0 for UART operation and configure receive interrupt.
  * 
- * @param baudRate Baud rate for the UART module.
+ * @param UCA_Module  EUSCI_A module. Valid parameters: - EUSCI_A0_BASE - EUSCI_A1_BASE - EUSCI_A2_BASE - EUSCI_A3_BASE
+ * @param baudRate    Baud rate for the UART module.
  * 
  * @note An ISR override [ void EUSCIA0_IRQHandler() ] is required to handle the interrupt.
  */
-void uart_init_IT(uint32_t baudRate)
+void uart_init_IT(uint32_t UCA_Module, uint32_t baudRate)
 {
 #ifdef EUSCI_A_UART_7_BIT_LEN
   // 固件库v3_40_01_02
@@ -212,9 +222,8 @@ void uart_init_IT(uint32_t baudRate)
   eusci_calcBaudDividers((eUSCI_UART_Config *)&uartConfig, baudRate); // 配置波特率
 #endif
 
-  MAP_GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION);
-  MAP_UART_initModule(EUSCI_A0_BASE, &uartConfig);
-  MAP_UART_enableModule(EUSCI_A0_BASE);
+  MAP_UART_initModule(UCA_Module, &uartConfig);
+  MAP_UART_enableModule(UCA_Module);
 
   UART_enableInterrupt(EUSCI_A0_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
   Interrupt_enableInterrupt(INT_EUSCIA0);
@@ -224,23 +233,41 @@ void uart_init_IT(uint32_t baudRate)
 // Section: UART Receiver Interrupt Handler
 
 UART_RxCtrl rc_a0;
+UART_RxCtrl rc_a1;
+UART_RxCtrl rc_a2;
+UART_RxCtrl rc_a3;
 
-void uart_A0_RxToZero(void (*callback)(uint8_t *data, uint8_t len), bool autoExpand)
+/**
+ * @brief Lets UART A0 keep receiving data, until it receives a newline, and immediately calls the specified callback function
+ * 
+ * @param rc          Pointer to the UART_RxCtrl. Use [ extern UART_RxCtrl rc_ax; ] ,where x is the UART module number, to access the UART_RxCtrl.
+ * @param callback    Function to be called when reception ends
+ * @param autoExpand  Whether to automatically expand the buffer. The buffer size defaults to 8 when set to true and doubles its size when full. 
+ * When set to false, the buffer size is limited by the macro definition in usart.h
+ * 
+ * @warning The function may drop all remaining data after the buffer overflows. If autoexpand is set to false, NEVER let it overflow.
+ * 
+ * @note Call RxReload() instead of this function to continue receiving.
+ * 
+ * @note Calling rxHandler() is required in the ISR override to make this function work.
+ */
+void uart_RxLine(UART_RxCtrl *rc, void (*callback)(uint8_t *data, uint8_t len), bool autoExpand)
 {
-  rc_a0.rxCallback = callback;
-  rc_a0.rxCnt = 0;
-  rc_a0.rxCplt = 0;
-  rc_a0.bufSize = autoExpand << 3;
+  rc->rxCallback = callback;
+  rc->rxCnt = 0;
+  rc->rxCplt = 0;
+  rc->bufSize = autoExpand << 3;
   if(autoExpand){
-    rc_a0.rxBuf = (uint8_t *)malloc(8);
+    rc->rxBuf = (uint8_t *)malloc(8);
   }
   else{
-    rc_a0.rxBuf = (uint8_t *)malloc(UART_RX_BUF_SIZE);
+    rc->rxBuf = (uint8_t *)malloc(UART_RX_BUF_SIZE);
   }
 }
 /**
- * @brief Resets the software UART receiver.
+ * @brief Resets the software UART receiver, allowing it to continue receiving data.
  * 
+ * @param rc  Pointer to the UART_RxCtrl. Use [ extern UART_RxCtrl rc_ax; ] ,where x is the UART module number, to access the UART_RxCtrl.
  */
 void rxReset(UART_RxCtrl *rc){
   rc->rxCnt = 0;
@@ -258,6 +285,12 @@ void rxReset(UART_RxCtrl *rc){
   rc->rxBuf = (uint8_t *)malloc(rc->bufSize);
 }
 
+/**
+ * @brief Handles incoming UART data if software handler is used. Call this function in the ISR override.
+ * 
+ * @param rc    Pointer to the UART_RxCtrl. Use [ extern UART_RxCtrl rc_ax; ] ,where x is the UART module number, to access the UART_RxCtrl.
+ * @param data  Data received from the UART module.
+ */
 inline void rxHandler(UART_RxCtrl *rc, uint8_t data){
   if(rc->rxCplt){
     printf("WARN> UART Rx receiving data, but reception is not ready. Data has been dropped.\n");
@@ -299,11 +332,45 @@ inline void rxHandler(UART_RxCtrl *rc, uint8_t data){
   }
 }
 
-inline void uart_A0_RxReload(){
-  rxReset(&rc_a0);
-  rc_a0.rxCplt = 0;
+/**
+ * @brief Reloads the UART A0 and continues receiving data, until a newline is received and callback function is called again.
+ * 
+ * @param rc Pointer to the UART_RxCtrl. Use [ extern UART_RxCtrl rc_ax; ] ,where x is the UART module number, to access the UART_RxCtrl.
+ */
+inline void uart_RxReload(UART_RxCtrl *rc)
+{
+  rxReset(rc);
+  rc->rxCplt = 0;
 }
 
+/**
+ * @brief         Start transmission of data from a specified UART peripheral.
+ *
+ * @param module  instance of the eUSCI A (UART) module.
+ *                Valid parameters include: - EUSCI_A0_BASE - EUSCI_A1_BASE - EUSCI_A2_BASE - EUSCI_A3_BASE
+ * @param fmt     Format string
+ * @param ...     Variable argument list
+ * 
+ * @note          The EUSCI_A0 is used exclusively for debugging, and can transmit data by using printf() function.
+ */
+void tx(uint32_t module, char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  char *buf = (char *)malloc(64);
+  int r = vsnprintf(buf, 64, fmt, ap);
+  if(r == -1) {
+    printf("ERR> UART Tx buffer write failed. Aborting transmission.\n");
+    return;
+  }
+  else if(r > 63) {
+    printf("ERR> UART Tx buffer overflow, data will not be transmitted.\n");
+    printf("To fix this issue, print the data in smaller chunks.\n");
+    return;
+  }
+  while(*buf) {
+    UART_transmitData(module, *buf++);
+  }
+}
     // void EUSCIA0_IRQHandler(void)
     // {
     //   uint32_t status = UART_getEnabledInterruptStatus(EUSCI_A0_BASE);

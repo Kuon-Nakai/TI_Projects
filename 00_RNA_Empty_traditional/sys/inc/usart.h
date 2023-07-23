@@ -75,10 +75,10 @@ typedef struct {
     void (*rxCallback)(uint8_t *data, uint8_t len); // Callback for RX
 } UART_RxCtrl;
 
-void uart_init(uint32_t baudRate);
-void uart_init_IT(uint32_t baudRate);
+void uart_init(uint32_t UCA_Module, uint32_t baudRate);
+void uart_init_IT(uint32_t UCA_Module, uint32_t baudRate);
 void rxHandler(UART_RxCtrl *rc, uint8_t data);
-void uart_A0_RxToZero(void (*callback)(uint8_t *, uint8_t), bool);
-void uart_A0_RxReload(void);
+void uart_RxLine(UART_RxCtrl *rc, void (*callback)(uint8_t *, uint8_t), bool);
+void uart_RxReload(UART_RxCtrl *rc);
 
 #endif

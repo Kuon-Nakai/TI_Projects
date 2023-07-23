@@ -1,3 +1,14 @@
-Load "d:\\GitHub\\TI_Projects\\00_RNA_Empty_traditional\\project\\keil\\Build\\my_project_rom.axf" 
-Erase Done.Programming Done.Verify OK.Application running ...
-Flash Load finished at 16:22:07
+*** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'my_project'
+compiling HAL_I2C.c...
+compiling dma.c...
+..\..\hardware\dma.c(3): warning:  #161-D: unrecognized #pragma
+  #pragma region DMA control table
+..\..\hardware\dma.c(14): warning:  #161-D: unrecognized #pragma
+  #pragma endregion
+..\..\hardware\dma.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=11912 RO-data=1012 RW-data=56 ZI-data=2656  
+After Build - User command #1: fromelf --bin --output .\Build\my_project_ROM.bin .\Build\my_project_ROM.axf
+".\Build\my_project_rom.axf" - 0 Error(s), 2 Warning(s).
+Build Time Elapsed:  00:00:01

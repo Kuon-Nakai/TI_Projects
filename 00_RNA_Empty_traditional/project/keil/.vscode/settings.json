@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "string": "c",
-        "driverlib.h": "c"
+        "driverlib.h": "c",
+        "pid.h": "c"
     }
 }
