@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "project/keil"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"string": "c",
+			"driverlib.h": "c",
+			"pid.h": "c",
+			"limits": "cpp"
+		},
+		"C_Cpp.default.intelliSenseMode": "gcc-arm",
+		"C_Cpp.dimInactiveRegions": true,
+		"C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": false,
+		"C_Cpp.inlayHints.parameterNames.suppressWhenArgumentContainsName": false,
+		"C_Cpp.inlayHints.autoDeclarationTypes.enabled": true
+	}
+}

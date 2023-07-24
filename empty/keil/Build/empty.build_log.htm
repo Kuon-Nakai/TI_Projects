@@ -1,0 +1,133 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.28.0.0
+Copyright (C) 2019 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Kuon Nakai, Brunhild Inc., LIC=47GU5-G4BHB-9UX4U-SUQYH-7PG1P-KFZZX
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.28.0.0
+Toolchain Path:  D:\Keil_v5\ARM\ARMCLANG\Bin
+C Compiler:      ArmClang.exe V6.12
+Assembler:       Armasm.exe V6.12
+Linker/Locator:  ArmLink.exe V6.12
+Library Manager: ArmAr.exe V6.12
+Hex Converter:   FromElf.exe V6.12
+CPU DLL:         SARMCM3.DLL V5.28.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      CMSIS_AGDI.dll V1.31.18.0
+Dialog DLL:      TCM.DLL V1.36.2.0
+ 
+<h2>Project:</h2>
+D:\GitHub\TI_Projects\empty\keil\empty.uvprojx
+Project File Date:  07/23/2023
+
+<h2>Output:</h2>
+*** Using Compiler 'V6.12', folder: 'D:\Keil_v5\ARM\ARMCLANG\Bin'
+Build target 'empty'
+startup_msp432p401r_uvision.s(37): error: expected identifier or '('
+;*/
+  ^
+startup_msp432p401r_uvision.s(39): error: expected identifier or '('
+; <h> Stack Configuration
+  ^
+startup_msp432p401r_uvision.s(40): error: expected identifier or '('
+;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
+    ^
+startup_msp432p401r_uvision.s(41): error: expected identifier or '('
+; </h>
+  ^
+startup_msp432p401r_uvision.s(50): error: expected identifier or '('
+; <h> Heap Configuration
+  ^
+startup_msp432p401r_uvision.s(51): error: expected identifier or '('
+;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+    ^
+startup_msp432p401r_uvision.s(52): error: expected identifier or '('
+; </h>
+  ^
+startup_msp432p401r_uvision.s(66): error: unknown type name 'Vector'
+; Vector Table Mapped to Address 0 at Reset
+  ^
+startup_msp432p401r_uvision.s(66): error: expected ';' after top level declarator
+; Vector Table Mapped to Address 0 at Reset
+              ^
+              ;
+startup_msp432p401r_uvision.s(73): error: unknown type name 'Top'
+__Vectors       DCD     __initial_sp              ; Top of Stack
+                                                    ^
+startup_msp432p401r_uvision.s(73): error: expected ';' after top level declarator
+__Vectors       DCD     __initial_sp              ; Top of Stack
+                                                          ^
+                                                          ;
+startup_msp432p401r_uvision.s(74): error: unknown type name 'Reset'
+                DCD     Reset_Handler             ; Reset Handler
+                                                    ^
+startup_msp432p401r_uvision.s(74): error: expected ';' after top level declarator
+                DCD     Reset_Handler             ; Reset Handler
+                                                                 ^
+                                                                 ;
+startup_msp432p401r_uvision.s(75): error: unknown type name 'NMI'
+                DCD     NMI_Handler               ; NMI Handler
+                                                    ^
+startup_msp432p401r_uvision.s(75): error: expected ';' after top level declarator
+                DCD     NMI_Handler               ; NMI Handler
+                                                               ^
+                                                               ;
+startup_msp432p401r_uvision.s(76): error: unknown type name 'Hard'
+                DCD     HardFault_Handler         ; Hard Fault Handler
+                                                    ^
+startup_msp432p401r_uvision.s(76): error: expected ';' after top level declarator
+                DCD     HardFault_Handler         ; Hard Fault Handler
+                                                              ^
+                                                              ;
+startup_msp432p401r_uvision.s(77): error: unknown type name 'MPU'
+                DCD     MemManage_Handler         ; MPU Fault Handler
+                                                    ^
+startup_msp432p401r_uvision.s(77): error: expected ';' after top level declarator
+                DCD     MemManage_Handler         ; MPU Fault Handler
+                                                             ^
+                                                             ;
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+compiling startup_msp432p401r_uvision.s...
+../system_msp432p401r.c(46): error: 'ti/devices/msp432p4xx/inc/msp.h' file not found
+#include <ti/devices/msp432p4xx/inc/msp.h>
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+compiling system_msp432p401r.c...
+../main.c(50): error: 'ti/devices/msp432p4xx/driverlib/driverlib.h' file not found
+#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+compiling main.c...
+".\Build\empty.axf" - 21 Error(s), 0 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.9.0.pack
+                ARM.CMSIS.5.9.0
+                CMSIS (Common Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.6.0
+
+Package Vendor: TexasInstruments
+                http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/msp432cmsis/latest/exports/TexasInstruments.MSP432P4xx_DFP.3.2.6.pack
+                TexasInstruments.MSP432P4xx_DFP.3.2.6
+                Device Family Pack for Texas Instruments SimpleLink(TM) MSP432 Series
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_empty
+  D:\ArmPacks\ARM\CMSIS\5.9.0\CMSIS\Core\Include
+  D:\ArmPacks\TexasInstruments\MSP432P4xx_DFP\3.2.6\Device\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.6.0
+Target not created.
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>
