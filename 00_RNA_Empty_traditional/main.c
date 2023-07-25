@@ -19,6 +19,8 @@
 #include "servo.h"
 #include "PID.h"
 
+#pragma diag_suppress 161 // Suppress the "unrecognized #pragma" warning, ignoring VSCode region tags for Keil.
+
 #define ENABLE_CMD_ECHO     0
 #define ENABLE_SERVO2_CMD   1
 #define ENABLE_PID_CMD      1
@@ -101,7 +103,7 @@ void cb(uint8_t *data, uint8_t len)
     }
 #endif
 #if ENABLE_PID_CMD // pid <__: instance selection> <command> <value> 
-    else if(strncasecmp(data, "pid ", 4) == 0){
+    else if(strncasecmp((char *)data, "pid ", 4) == 0){
         PIDController *pc = NULL;
         int offset;
         if      (strncasecmp((char *)data + 4, "x ",  2) == 0)      pc = pidx,  offset = 6;

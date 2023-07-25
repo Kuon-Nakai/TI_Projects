@@ -3,5 +3,11 @@
         "string": "c",
         "driverlib.h": "c",
         "pid.h": "c"
-    }
+    },
+    "C_Cpp.default.defines": [
+        "__MSP432P401R__",
+        "__TARGET_FPU_VFP",
+        "__FPU_PRESENT",
+        "ARM_MATH_CM4"
+    ]
 }

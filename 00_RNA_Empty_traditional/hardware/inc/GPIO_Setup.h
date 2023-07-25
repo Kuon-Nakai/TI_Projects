@@ -30,7 +30,7 @@
 
 #define GPIO_UCB0_I2C_Init() \
     GPIO_setAsPeripheralModuleFunctionInputPin(1, 0x0020, 1) \
-    GPIO_setAsPeripheralModuleFunctionInputPin(1, 0x0040, 1) // P1.6 SDA, P1.7 SCL
+    GPIO_setAsPeripheralModuleFunctionInputPin(1, 0x0060, 1) // P1.6 SDA, P1.7 SCL
 
 #endif // ENABLE_AUTO_SETUP
 

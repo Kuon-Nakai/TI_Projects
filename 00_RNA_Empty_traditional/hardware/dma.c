@@ -1,4 +1,5 @@
 #include "dma.h"
+#pragma diag_suppress 161
 
 #pragma region DMA control table
 #if defined(__TI_COMPILER_VERSION__)
@@ -13,7 +14,10 @@ __align(1024)
 static DMA_ControlTable DMAControlTable[32];
 #pragma endregion
 
-// #define ADC_EnableDMA(buf, len)     
+inline void ADC_InitDMA(uint32_t channelPeriph, uint16_t *Buf, uint16_t Length) {
+    // DMA_Init(channelPeriph, UDMA_PRI_SELECT, UDMA_SIZE_16, UDMA_SRC_INC_NONE, UDMA_DST_INC_16, UDMA_ARB_1, UDMA_MODE_BASIC, INT_DMA_INT1, (void *)&ADC14->MEM[0], (void *)Buf, Length, UDMA_ATTR_ALTSELECT | UDMA_ATTR_USEBURST | UDMA_ATTR_HIGH_PRIORITY | UDMA_ATTR_REQMASK);
+}
+
 void adc_dma_init(uint16_t *Data, uint16_t Length)
 {
     /* Configuring DMA module */
@@ -34,8 +38,7 @@ void adc_dma_init(uint16_t *Data, uint16_t Length)
  * @brief Basic function to initialize DMA.
  *
  * @param channelPeriph     DMA channel peripheral selection [ DMA_CHx_<periph_function> ]. Type in one of them & F12 to see the full list.
- * @param channel           DMA channel number as a integer.
- * @param control           indication if the primary or alternate control structure should be used. Valid parameters: UDMA_PRI_SELECT, UDMA_ALT_SELECT.
+ * @param control           Indication if the primary or alternate control structure should be used. Valid parameters: UDMA_PRI_SELECT, UDMA_ALT_SELECT.
  * @param size              DMA transfer size. Valid parameters: UDMA_SIZE_8, UDMA_SIZE_16, UDMA_SIZE_32.
  * @param srcInc            DMA source address increment. Valid parameters: UDMA_SRC_INC_8, UDMA_SRC_INC_16, UDMA_SRC_INC_32, UDMA_SRC_INC_NONE.
  * @param dstInc            DMA destination address increment. Valid parameters: UDMA_DST_INC_8, UDMA_DST_INC_16, UDMA_DST_INC_32, UDMA_DST_INC_NONE.
@@ -56,7 +59,8 @@ void adc_dma_init(uint16_t *Data, uint16_t Length)
  * 
  * @deprecated See all this parameters going like chaos here? No you don't want to use it.
  */
-inline void DMA_Init(uint32_t channelPeriph, uint8_t channel, uint32_t control, uint32_t size, uint32_t srcInc, uint32_t dstInc, uint32_t arbitrationSize, uint32_t mode, uint8_t interrupt, void *src, void *dst, uint16_t Length, uint32_t enableAttributes) {
+inline void DMA_Init(uint32_t channelPeriph, uint32_t control, uint32_t size, uint32_t srcInc, uint32_t dstInc, uint32_t arbitrationSize, uint32_t mode, uint8_t interrupt, void *src, void *dst, uint16_t Length, uint32_t enableAttributes) {
+    uint8_t channel = channelPeriph & 0x0F;
     MAP_DMA_enableModule();
     MAP_DMA_setControlBase(DMAControlTable);
     MAP_DMA_assignChannel(channelPeriph);
@@ -71,7 +75,7 @@ inline void DMA_Init(uint32_t channelPeriph, uint8_t channel, uint32_t control, 
     MAP_DMA_enableChannel(channel);
 }
 
-inline void DMA_Module_Enable() {
+void DMA_Module_Enable() {
     MAP_DMA_enableModule();
     MAP_DMA_setControlBase(DMAControlTable);
 }

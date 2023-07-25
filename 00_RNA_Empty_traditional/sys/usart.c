@@ -89,17 +89,25 @@ int printf(const char *str, ...)
 //if 1 使用标准C库 如果报错就使用微库
 //if 0 使用微库 得去勾选魔术棒里的 Use MicroLIB
 #if 1
+#if defined(__GNUC__) // AC6
+__asm(".global __use_no_semihosting \n\t");
+#elif defined(__CC_ARM) // AC5
 #pragma import(__use_no_semihosting)
+#endif
 //标准库需要的支持函数
-struct __FILE
-{
-  int handle;
-};
+// struct __FILE
+// {
+//   int handle;
+// };
 FILE __stdout;
 //定义_sys_exit()以避免使用半主机模式
 void _sys_exit(int x)
 {
   x = x;
+}
+_ttywrch(int ch)
+{
+  ch = ch;
 }
 #else
 int fgetc(FILE *f)
@@ -243,7 +251,7 @@ UART_RxCtrl rc_a3;
  * @param rc          Pointer to the UART_RxCtrl. Use [ extern UART_RxCtrl rc_ax; ] ,where x is the UART module number, to access the UART_RxCtrl.
  * @param callback    Function to be called when reception ends
  * @param autoExpand  Whether to automatically expand the buffer. The buffer size defaults to 8 when set to true and doubles its size when full. 
- * When set to false, the buffer size is limited by the macro definition in usart.h
+ *                    When set to false, the buffer size is limited by the macro definition in usart.h
  * 
  * @warning The function may drop all remaining data after the buffer overflows. If autoexpand is set to false, NEVER let it overflow.
  * 

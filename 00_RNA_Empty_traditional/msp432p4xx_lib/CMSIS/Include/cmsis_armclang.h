@@ -30,7 +30,8 @@
 #pragma clang system_header   /* treat file as system include file */
 
 #ifndef __ARM_COMPAT_H
-#include <arm_compat.h>    /* Compatibility header for Arm Compiler 5 intrinsics */
+//#include <arm_compat.h>    /* Compatibility header for Arm Compiler 5 intrinsics */
+// NOTE: This include has been disabled, as its dependency (arm_acle.h) does not work with armclang and brings up hundreds of errors. -Shiki
 #endif
 
 /* CMSIS compiler specific defines */

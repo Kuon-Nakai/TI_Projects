@@ -73,16 +73,19 @@ void Init_I2C_GPIO()
  *
  * @param module        I2C module to be configured. [ EUSCI_Bx_BASE ]
  * @param DMAChPeriph   DMA channel peripheral selection [ DMA_CHx_<periph_function> ]. Type in one of them & F12 to see the full list.
- * @param DMACh         DMA channel number as a integer.
  * @param interrupt     DMA interrupt number. Valid parameters: INT_DMA_INT0, INT_DMA_INT1, INT_DMA_INT2, INT_DMA_INT3.
  * @param buf           Pointer to the buffer to be filled.
  * @param size          Size of the buffer to be filled.
+ * 
+ * @deprecated          Work in progress.
  */
-inline void I2C_RxStart_DMA(uint32_t module, uint32_t DMAChPeriph, uint8_t DMACh, uint8_t interrupt, void *buf, uint16_t size) {
-    DMA_Init(DMAChPeriph, DMACh, UDMA_PRI_SELECT, UDMA_SIZE_8, UDMA_SRC_INC_NONE, UDMA_DST_INC_8, UDMA_ARB_1, UDMA_MODE_BASIC, interrupt, 
+inline void I2C_RxStart_DMA(uint32_t module, uint32_t DMAChPeriph, uint8_t interrupt, void *buf, uint16_t size) {
+    DMA_Init(DMAChPeriph, UDMA_PRI_SELECT, UDMA_SIZE_8, UDMA_SRC_INC_NONE, UDMA_DST_INC_8, UDMA_ARB_1, UDMA_MODE_BASIC, interrupt, 
         (void *)MAP_I2C_getReceiveBufferAddressForDMA(module), buf, size, 0x00);
 
 }
+
+// void I2C_RxDMA_Reload(uint32_t module)
 
 /**
  * @brief Configures I2C in master mode.

@@ -6,6 +6,8 @@
 // 创建日期:2021/8/26
 /****************************************************/
 
+#pragma diag_suppress 161 // Suppress the "unrecognized #pragma" warning, ignoring VSCode region tags for Keil.
+
 #include "timA.h"
 
 /**************************************         TIMA2          *******************************************/
@@ -167,3 +169,9 @@ void TA0_0_IRQHandler(void)
     /*结束填充用户代码*/
 }
 /*********************************************************************************************************/
+
+#pragma region Input Capture
+
+
+
+#pragma endregion
