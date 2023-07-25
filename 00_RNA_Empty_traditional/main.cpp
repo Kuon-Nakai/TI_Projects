@@ -7,8 +7,19 @@
 // 创建日期:2021/9/28
 /****************************************************/
 
-#include "sysinit.h"
 #include "usart.h"
+
+#ifdef __cplusplus
+
+#include <string>
+
+using namespace std;
+
+extern "C" {
+#endif
+
+#include "sysinit.h"
+// #include "usart.h"
 #include "delay.h"
 #include "led.h"
 #include "tim32.h"
@@ -29,7 +40,8 @@
 #define ENABLE_SERVO2_CMD   1
 #define ENABLE_PID_CMD      1
 
-extern UART_RxCtrl rc_a0;
+// extern UART_RxCtrl rc_a0;
+
 
 ServoControl2 *sc;
 PIDController *pidx;
@@ -38,17 +50,26 @@ PIDController *pidxv;
 PIDController *pidyv;
 char cmd[32];
 
-void cb(uint8_t *data, uint8_t len);
+#ifdef __cplusplus
+}
+#endif
+
+//////////////////////////////////////  C++ Region Start  //////////////////////////////////////
+
+UART_Port *UCA0 = nullptr;
+
+void _cb(uint8_t *data, uint8_t len);
+void cb(string data);
 
 int main(void)
 {
     SysInit();         // 第3讲 时钟配置
-
+    
     MAP_GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION);
-    uart_init_IT(EUSCI_A0_BASE, 115200); // 第7讲 串口配置
+    // uart_init_IT(EUSCI_A0_BASE, 115200); // 第7讲 串口配置
     delay_init();      // 第4讲 滴答延时
 
-    uart_RxLine(&rc_a0, cb, true); // Configure debug probe UART, with auto buffer expansion
+    // uart_RxLine(&rc_a0, cb, true); // Configure debug probe UART, with auto buffer expansion
     /*开始填充初始化代码*/
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0); // P1.0 as GPIO output (red LED), def. 1
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
@@ -61,6 +82,15 @@ int main(void)
     GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN4 | GPIO_PIN5, GPIO_PRIMARY_MODULE_FUNCTION); // P2.4, P2.5 as PWM output
     sc = ServoControl2_init(50, TIMER_A0_BASE, TIMER_A_CAPTURECOMPARE_REGISTER_1, TIMER_A_CAPTURECOMPARE_REGISTER_2);
     // ServoControl2_setParams(sc, 1500, 2500, 11.111111f, -11.666667f);
+
+#pragma region UART C++ Test Region
+
+    UCA0 = new UART_Port(EUSCI_A0_BASE, 115200);
+    UCA0->RxLine(cb, true); // Configure debug probe UART, with auto buffer expansion
+
+    // UCA0->RxReload();
+
+#pragma endregion
 
     /*停止填充初始化代码*/
 
@@ -75,18 +105,19 @@ int main(void)
     }
 }
 
-void EUSCIA0_IRQHandler(){
+extern "C" void EUSCIA0_IRQHandler(){
     uint32_t status = MAP_UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
     if(status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
         uint8_t data = MAP_UART_receiveData(EUSCI_A0_BASE);
         // Handle incoming UART transmission
         // UART_transmitData(EUSCI_A0_BASE, data);ser
-        rxHandler(&rc_a0, data);
+        // rxHandler(&rc_a0, data);
+        UCA0->RxHandler(data);
     }
 }
 
 // UART A0 Rx callback for command processing
-void cb(uint8_t *data, uint8_t len)
+void _cb(uint8_t *data, uint8_t len)
 {
 #if ENABLE_CMD_ECHO
     printf("Received %d bytes: ", len);
@@ -94,7 +125,7 @@ void cb(uint8_t *data, uint8_t len)
 #endif
     if(strcmp((char *)data, "/") == 0){
         memset(cmd, 0, 32);
-        uart_RxReload(&rc_a0);
+        // uart_RxReload(&rc_a0);
         return;
     }
 #if ENABLE_SERVO2_CMD // servo2 <command> <value>
@@ -126,7 +157,7 @@ void cb(uint8_t *data, uint8_t len)
             else if (strncasecmp((char *)data + offset, "t ",       2) == 0)    pc->T          = atof((char *)data + offset + 2);
             else {
                 printf("Unknown PID command: %s\n", data);
-                uart_RxReload(&rc_a0);
+                // uart_RxReload(&rc_a0);
                 return;
             }
             printf("Operation completed.\n");
@@ -135,5 +166,11 @@ void cb(uint8_t *data, uint8_t len)
     }
 #endif
     else printf("Unknown command: %s\n", data);
-    uart_RxReload(&rc_a0);
+    // uart_RxReload(&rc_a0);
+}
+
+void cb(string data) {
+    printf("Received %d bytes: ", data.length());
+    printf("%s\n", data.c_str());
+    UCA0->RxReload();
 }

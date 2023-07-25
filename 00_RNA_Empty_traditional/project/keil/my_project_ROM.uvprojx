@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>7</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -394,9 +394,9 @@
               <FilePath>startup_msp432p401r_uvision.s</FilePath>
             </File>
             <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\main.c</FilePath>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -484,11 +484,6 @@
           <GroupName>SYS</GroupName>
           <Files>
             <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\sys\usart.c</FilePath>
-            </File>
-            <File>
               <FileName>sysinit.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\sys\sysinit.c</FilePath>
@@ -502,6 +497,16 @@
               <FileName>baudrate_calculate.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\sys\baudrate_calculate.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\sys\usart.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>usart.h</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\sys\inc\usart.h</FilePath>
             </File>
           </Files>
         </Group>

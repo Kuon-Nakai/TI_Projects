@@ -1,3 +1,5 @@
+/* -*- C++ -*- */
+
 /****************************************************/
 // MSP432P401R
 // 串口配置
@@ -51,11 +53,21 @@
  * 
  ****************************************************/
 
+#define USE_CPP 1
+
+#ifdef __cplusplus
+// #include <functional>
+#include <string>
+using namespace std;
+extern "C" {
+#endif
+
 #ifndef __USART_H
 #define __USART_H
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <stdbool.h>
 #include "stdio.h" //1.61328125kb
+
 
 #ifdef __TI_COMPILER_VERSION__
 //CCS平台
@@ -67,18 +79,48 @@ int printf(const char *str, ...);
 
 #define UART_RX_BUF_SIZE 64
 
-typedef struct {
-    uint8_t *rxBuf;  // Buffer pointer for RX
-    uint16_t rxCnt;  // Buffer size for RX
-    uint16_t bufSize;// Dynamic buffer size, set to 0 to use fixed size.
-    bool rxCplt;     // Reception status
-    void (*rxCallback)(uint8_t *data, uint8_t len); // Callback for RX
-} UART_RxCtrl;
+#ifdef __cplusplus
+}
+#endif
 
-void uart_init(uint32_t UCA_Module, uint32_t baudRate);
-void uart_init_IT(uint32_t UCA_Module, uint32_t baudRate);
-void rxHandler(UART_RxCtrl *rc, uint8_t data);
-void uart_RxLine(UART_RxCtrl *rc, void (*callback)(uint8_t *, uint8_t), bool);
-void uart_RxReload(UART_RxCtrl *rc);
+#if USE_CPP
+/**
+ * @brief UART Port class for C++. Object-oriented style makes it easier to use.
+ *
+ */
+class UART_Port {
+private:
+uint8_t *rxBuf;
+uint16_t rxCnt;
+uint16_t bufSize;
+bool rxCplt;
+void (*rxCallback)(string);
 
+public:
+void RxReload();
+void RxReset();
+void RxHandler(uint8_t data);
+void RxLine(void(*callback)(string), bool autoExpand = true);
+void Tx(string data);
+UART_Port(uint32_t UCA_Module, uint32_t baudRate);
+~UART_Port();
+};
+#else
+
+    typedef struct
+    {
+        uint8_t *rxBuf;                                 // Buffer pointer for RX
+        uint16_t rxCnt;                                 // Buffer size for RX
+        uint16_t bufSize;                               // Dynamic buffer size, set to 0 to use fixed size.
+        bool rxCplt;                                    // Reception status
+        void (*rxCallback)(uint8_t *data, uint8_t len); // Callback for RX
+    } UART_RxCtrl;
+
+    void uart_init(uint32_t UCA_Module, uint32_t baudRate);
+    void uart_init_IT(uint32_t UCA_Module, uint32_t baudRate);
+    void rxHandler(UART_RxCtrl *rc, uint8_t data);
+    void uart_RxLine(UART_RxCtrl *rc, void (*callback)(uint8_t *, uint8_t), bool);
+    void uart_RxReload(UART_RxCtrl *rc);
+
+#endif
 #endif

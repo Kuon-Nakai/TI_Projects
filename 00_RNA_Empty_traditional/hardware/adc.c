@@ -18,7 +18,7 @@
  ************************/
  
 #include "adc.h"
-#include "usart.h"
+// #include "usart.h"
  
 //总时间  M*N*21us
 #define N 200 //采样次数
@@ -87,8 +87,8 @@ void ADC14_IRQHandler(void)
 #endif
     {
         MAP_ADC14_getMultiSequenceResult(resultsBuffer);
-        for (i = 0; i < M; i++)
-            printf("[%d]:%d\r\t", i, resultsBuffer[i]);
-        printf("\r\n");
+        // for (i = 0; i < M; i++)
+        //     printf("[%d]:%d\r\t", i, resultsBuffer[i]);
+        // printf("\r\n");
     }
 }

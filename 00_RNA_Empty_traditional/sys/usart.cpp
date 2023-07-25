@@ -51,7 +51,14 @@
  * 
  ****************************************************/
 
+#ifdef __cplusplus
 #include "usart.h"
+using namespace std;
+extern "C" {
+#else
+#include "usart.h"
+#endif
+
 #include "baudrate_calculate.h"
 #include <stdlib.h>
 #include <string.h>
@@ -90,7 +97,7 @@ int printf(const char *str, ...)
 //if 0 使用微库 得去勾选魔术棒里的 Use MicroLIB
 #if 1
 #if defined(__GNUC__) // AC6
-__asm(".global __use_no_semihosting \n\t");
+// __asm(".global __use_no_semihosting \n\t");
 #elif defined(__CC_ARM) // AC5
 #pragma import(__use_no_semihosting)
 #endif
@@ -99,7 +106,7 @@ __asm(".global __use_no_semihosting \n\t");
 // {
 //   int handle;
 // };
-FILE __stdout;
+// FILE __stdout;
 //定义_sys_exit()以避免使用半主机模式
 void _sys_exit(int x)
 {
@@ -135,6 +142,147 @@ int fputc(int ch, FILE *f)
  *
  *****************   说明结束   *****************/
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#if USE_CPP
+
+void UART_Port::RxHandler(uint8_t data) {
+  if(rxCplt){
+    printf("WARN> UART Rx receiving data, but reception is not ready. Data has been dropped.\n");
+    return;
+  }
+  if(data == 0 || data == '\n'){
+    // Rx complete
+    rxCplt = 1;
+    rxBuf[rxCnt++] = 0;
+    rxCallback(string((char *)rxBuf)); // --rxCnt?
+    return;
+  }
+  rxBuf[rxCnt++] = data;
+  // rxCnt = received size from here on
+  if(bufSize && (rxCnt == bufSize)){
+    // Auto reallocation
+    bufSize <<= 1;
+    uint8_t *tmp = rxBuf;
+    if ((rxBuf = (uint8_t *)realloc(rxBuf, bufSize)) == NULL)
+    {
+      // Reallocation unsuccessful
+      printf("ERR> UART Rx buffer reallocation failed. RxCtrl has been reset.\n");
+      free(tmp);
+      RxReset();
+      return;
+    }
+    if(rxBuf != tmp){
+      // Move to reallocated buffer
+      memmove(rxBuf, tmp, rxCnt);
+      free(tmp);
+    }
+  }
+  else if(!bufSize && (rxCnt + 1 == UART_RX_BUF_SIZE)){
+    // Buffer full, invoke callback & reset
+    rxCplt = 1;
+    rxBuf[rxCnt++] = 0;
+    rxCallback(string((char *)rxBuf)); // --rxCnt?
+    // rxReset(rc);
+  }
+}
+
+void UART_Port::RxReset() {
+  rxCnt = 0;
+  rxCplt = 0;
+  bufSize = bufSize ? 8 : 0;
+  free(rxBuf);
+  if (bufSize)
+  {
+    rxBuf = (uint8_t *)malloc(8);
+  }
+  else
+  {
+    rxBuf = (uint8_t *)malloc(UART_RX_BUF_SIZE);
+  }
+  rxBuf = (uint8_t *)malloc(bufSize);
+}
+
+void UART_Port::RxReload() {
+  RxReset();
+  rxCplt = 0;
+}
+
+void UART_Port::Tx(string data) {
+  for (uint16_t i = 0; i < data.length(); i++)
+  {
+    UART_transmitData(EUSCI_A0_BASE, data[i]);
+  }
+  // TODO: Should be a better way to do this
+}
+
+void UART_Port::RxLine(void (*callback)(string), bool autoExpand)
+{
+  rxCallback = callback;
+  rxCnt = 0;
+  rxCplt = 0;
+  bufSize = autoExpand << 3;
+  if(autoExpand){
+    rxBuf = (uint8_t *)malloc(8);
+  }
+  else{
+    rxBuf = (uint8_t *)malloc(UART_RX_BUF_SIZE);
+  }
+}
+
+UART_Port::UART_Port(uint32_t UCA_Module, uint32_t baudRate)
+{
+#ifdef EUSCI_A_UART_7_BIT_LEN
+  // 固件库v3_40_01_02
+  // 默认SMCLK 48MHz 比特率 115200
+  const eUSCI_UART_ConfigV1 uartConfig =
+      {
+          EUSCI_A_UART_CLOCKSOURCE_SMCLK,                // SMCLK Clock Source
+          26,                                            // BRDIV = 26
+          0,                                             // UCxBRF = 0
+          111,                                           // UCxBRS = 111
+          EUSCI_A_UART_NO_PARITY,                        // No Parity
+          EUSCI_A_UART_LSB_FIRST,                        // MSB First
+          EUSCI_A_UART_ONE_STOP_BIT,                     // One stop bit
+          EUSCI_A_UART_MODE,                             // UART mode
+          EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION, // Oversampling
+          EUSCI_A_UART_8_BIT_LEN                         // 8 bit data length
+      };
+  eusci_calcBaudDividers((eUSCI_UART_ConfigV1 *)&uartConfig, baudRate); // 配置波特率
+#else
+  // 固件库v3_21_00_05
+  // 默认SMCLK 48MHz 比特率 115200
+  const eUSCI_UART_Config uartConfig =
+      {
+          EUSCI_A_UART_CLOCKSOURCE_SMCLK,                // SMCLK Clock Source
+          26,                                            // BRDIV = 26
+          0,                                             // UCxBRF = 0
+          111,                                           // UCxBRS = 111
+          EUSCI_A_UART_NO_PARITY,                        // No Parity
+          EUSCI_A_UART_LSB_FIRST,                        // MSB First
+          EUSCI_A_UART_ONE_STOP_BIT,                     // One stop bit
+          EUSCI_A_UART_MODE,                             // UART mode
+          EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION, // Oversampling
+      };
+  eusci_calcBaudDividers((eUSCI_UART_Config *)&uartConfig, baudRate); // 配置波特率
+#endif
+
+  MAP_UART_initModule(UCA_Module, &uartConfig);
+  MAP_UART_enableModule(UCA_Module);
+
+  UART_enableInterrupt(EUSCI_A0_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
+  Interrupt_enableInterrupt(INT_EUSCIA0);
+  Interrupt_enableMaster();
+}
+
+UART_Port::~UART_Port()
+{
+}
+
+#else
 
 /**
  * @brief Initialize specified EUSCI_A module for UART operation.
@@ -380,12 +528,5 @@ void tx(uint32_t module, char *fmt, ...) {
     UART_transmitData(module, *buf++);
   }
 }
-    // void EUSCIA0_IRQHandler(void)
-    // {
-    //   uint32_t status = UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
 
-    //   if (status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG)
-    //   {
-    //     rxHandler(&rc_a0, MAP_UART_receiveData(EUSCI_A0_BASE));
-    //   }
-    // }
+#endif
