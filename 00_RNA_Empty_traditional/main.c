@@ -19,7 +19,11 @@
 #include "servo.h"
 #include "PID.h"
 
-#pragma diag_suppress 161 // Suppress the "unrecognized #pragma" warning, ignoring VSCode region tags for Keil.
+#if defined(__GNUC__)
+// #pragma clang diagnostic ignored 161
+#elif defined(__CC_ARM)
+#pragma diag_suppress 161 // Suppress the "unrecognized #pragma" warning, ignoring VSCode region tags for Keil. AC5 only.
+#endif
 
 #define ENABLE_CMD_ECHO     0
 #define ENABLE_SERVO2_CMD   1
