@@ -105,9 +105,10 @@ void _sys_exit(int x)
 {
   x = x;
 }
-_ttywrch(int ch)
+int _ttywrch(int ch)
 {
   ch = ch;
+  return 0;
 }
 #else
 int fgetc(FILE *f)

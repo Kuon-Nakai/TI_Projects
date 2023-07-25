@@ -1,5 +1,8 @@
 #include "dma.h"
+
+#if defined(__CC_ARM)
 #pragma diag_suppress 161
+#endif
 
 #pragma region DMA control table
 #if defined(__TI_COMPILER_VERSION__)

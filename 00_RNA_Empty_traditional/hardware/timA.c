@@ -6,7 +6,9 @@
 // 创建日期:2021/8/26
 /****************************************************/
 
+#if defined(__CC_ARM)
 #pragma diag_suppress 161 // Suppress the "unrecognized #pragma" warning, ignoring VSCode region tags for Keil.
+#endif
 
 #include "timA.h"
 
