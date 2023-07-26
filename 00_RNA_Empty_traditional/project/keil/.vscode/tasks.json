@@ -1,0 +1,33 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cmake",
+			"label": "CMake: build",
+			"command": "build",
+			"targets": [
+				"[N/A - Select Kit]"
+			],
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template build task"
+		},
+		{
+			"type": "cmsis-csolution.build",
+			"solution": "${command:cmsis-csolution.getSolutionPath}",
+			"project": "${command:cmsis-csolution.getProjectPath}",
+			"buildType": "${command:cmsis-csolution.getBuildType}",
+			"targetType": "${command:cmsis-csolution.getTargetType}",
+			"rebuild": false,
+			"problemMatcher": [],
+			"label": "cmsis-csolution.build: Build"
+		},
+		{
+			"type": "embedded-debug.daplink-flash",
+			"serialNumber": "${command:device-manager.getSerialNumber}",
+			"program": "${command:embedded-debug.getBinaryFile}",
+			"problemMatcher": [],
+			"label": "embedded-debug.daplink-flash: Flash Device (DAPLink)"
+		}
+	]
+}

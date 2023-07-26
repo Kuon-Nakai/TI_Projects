@@ -56,7 +56,7 @@ char cmd[32];
 
 //////////////////////////////////////  C++ Region Start  //////////////////////////////////////
 
-UART_Port *UCA0 = nullptr;
+UART_Port *UCA0 = 0;
 
 void _cb(uint8_t *data, uint8_t len);
 void cb(string data);

@@ -1,0 +1,150 @@
+/*
+ *  CMSIS Pack Debug Access Sequence Log
+ *  File        : D:\GitHub\TI_Projects\00_RNA_Empty_traditional\project\keil\my_project_ROM_Sequences_0000.log
+ *  Created     : 13:46:13 (26/07/2023)
+ *  Device      : MSP432P401R
+ *  PDSC File   : D:\ArmPacks\TexasInstruments\MSP432P4xx_DFP\3.2.6\TexasInstruments.MSP432P4xx_DFP.pdsc
+ *
+ */
+
+[13:46:13.265]  **********  Sequence "DebugDeviceUnlock"  (Context="Connect", Pname="", info="")
+[13:46:13.265]  
+[13:46:13.265]  <debugvars>
+[13:46:13.265]    __protocol=0x00010002   (Protocol="SWD", SWJ-DP="True")
+[13:46:13.265]    __connection=0x00000201   (Connection Type="Debug", Reset Type="System Reset")
+[13:46:13.266]    __dp=0x00000000
+[13:46:13.266]    __ap=0x00000000
+[13:46:13.266]    __traceout=0x00000000   (Trace Disabled)
+[13:46:13.266]    __errorcontrol=0x00000000   (Skip Errors="False")
+[13:46:13.266]    __FlashAddr=0x00000000
+[13:46:13.266]    __FlashLen=0x00000000
+[13:46:13.266]    __FlashArg=0x00000000
+[13:46:13.266]    __FlashOp=0x00000000
+[13:46:13.266]    __Result=0x00000000
+[13:46:13.266]  </debugvars>
+[13:46:13.266]  
+[13:46:13.266]  <sequence name="DebugDeviceUnlock" Pname="" disable="false" info="">
+[13:46:13.266]    <block atomic="false" info="">
+[13:46:13.266]      __var securityIsEnabled = 0;
+[13:46:13.266]        // -> [securityIsEnabled <= 0x00000000]
+[13:46:13.266]      __var unlockDevice = 0;
+[13:46:13.267]        // -> [unlockDevice <= 0x00000000]
+[13:46:13.267]      DAP_Delay(100000);
+[13:46:13.368]        // -> [DAP_Delay(100000)]
+[13:46:13.368]      Write32(0xE0044000, 0x0000695A);
+[13:46:13.374]        // -> [Write32(0xE0044000, 0x0000695A)] (__dp=0, __ap=0)
+[13:46:13.374]      securityIsEnabled = Read32(0xE0044020);
+[13:46:13.379]        // -> [Read32(0xE0044020) => 0x00000003] (__dp=0, __ap=0)
+[13:46:13.379]        // -> [securityIsEnabled <= 0x00000003]
+[13:46:13.379]    </block>
+[13:46:13.379]    <control if="securityIsEnabled & 0x38" while="" timeout="0" info="">
+[13:46:13.379]      // if-block "securityIsEnabled & 0x38"
+[13:46:13.379]        // =>  FALSE
+[13:46:13.379]      // skip if-block "securityIsEnabled & 0x38"
+[13:46:13.379]    </control>
+[13:46:13.379]  </sequence>
+[13:46:13.379]  
+[13:46:13.611]  **********  Sequence "DebugCodeMemRemap"  (Context="Code Verify", Pname="", info="")
+[13:46:13.611]  
+[13:46:13.612]  <debugvars>
+[13:46:13.612]    __protocol=0x00010002   (Protocol="SWD", SWJ-DP="True")
+[13:46:13.612]    __connection=0x00000201   (Connection Type="Debug", Reset Type="System Reset")
+[13:46:13.612]    __dp=0x00000000
+[13:46:13.612]    __ap=0x00000000
+[13:46:13.612]    __traceout=0x00000000   (Trace Disabled)
+[13:46:13.612]    __errorcontrol=0x00000000   (Skip Errors="False")
+[13:46:13.612]    __FlashAddr=0x00000000
+[13:46:13.612]    __FlashLen=0x00000000
+[13:46:13.613]    __FlashArg=0x00000000
+[13:46:13.613]    __FlashOp=0x00000000
+[13:46:13.613]    __Result=0x00000000
+[13:46:13.613]  </debugvars>
+[13:46:13.613]  
+[13:46:13.613]  <sequence name="DebugCodeMemRemap" Pname="" disable="false" info="">
+[13:46:13.613]    <block atomic="false" info="">
+[13:46:13.613]      __var deviceId = 0;
+[13:46:13.613]        // -> [deviceId <= 0x00000000]
+[13:46:13.613]      __var hwRevision = 0;
+[13:46:13.613]        // -> [hwRevision <= 0x00000000]
+[13:46:13.613]      __var isMSP432P401M = 0;
+[13:46:13.613]        // -> [isMSP432P401M <= 0x00000000]
+[13:46:13.613]      __var isMSP432P401R = 0;
+[13:46:13.613]        // -> [isMSP432P401R <= 0x00000000]
+[13:46:13.613]      __var isMSP432P4111 = 0;
+[13:46:13.613]        // -> [isMSP432P4111 <= 0x00000000]
+[13:46:13.614]      __var isMSP432P411Y = 0;
+[13:46:13.614]        // -> [isMSP432P411Y <= 0x00000000]
+[13:46:13.614]      __var isMSP432P411V = 0;
+[13:46:13.614]        // -> [isMSP432P411V <= 0x00000000]
+[13:46:13.614]      __var isMSP432P4011 = 0;
+[13:46:13.614]        // -> [isMSP432P4011 <= 0x00000000]
+[13:46:13.614]      __var isMSP432P401Y = 0;
+[13:46:13.614]        // -> [isMSP432P401Y <= 0x00000000]
+[13:46:13.614]      __var isMSP432P401V = 0;
+[13:46:13.614]        // -> [isMSP432P401V <= 0x00000000]
+[13:46:13.614]      __var isMSP432P4xx_FLCTL = 0;
+[13:46:13.614]        // -> [isMSP432P4xx_FLCTL <= 0x00000000]
+[13:46:13.614]      __var isMSP432P4xx_FLCTL_A = 0;
+[13:46:13.614]        // -> [isMSP432P4xx_FLCTL_A <= 0x00000000]
+[13:46:13.614]      __var isMSP432P4xx_FLCTL_Production = 0;
+[13:46:13.614]        // -> [isMSP432P4xx_FLCTL_Production <= 0x00000000]
+[13:46:13.614]      __var qResult = 0;
+[13:46:13.614]        // -> [qResult <= 0x00000000]
+[13:46:13.614]      deviceId =   Read32(0x0020100C);
+[13:46:13.620]        // -> [Read32(0x0020100C) => 0x0000A000] (__dp=0, __ap=0)
+[13:46:13.620]        // -> [deviceId <= 0x0000A000]
+[13:46:13.620]      hwRevision = Read32(0x00201010);
+[13:46:13.625]        // -> [Read32(0x00201010) => 0x00000044] (__dp=0, __ap=0)
+[13:46:13.625]        // -> [hwRevision <= 0x00000044]
+[13:46:13.625]      isMSP432P401M = 
+                  (deviceId == 0x0000A001) ||
+                  (deviceId == 0x0000A003) ||
+                  (deviceId == 0x0000A005);
+[13:46:13.625]        // -> [isMSP432P401M <= 0x00000000]
+[13:46:13.625]      isMSP432P401R = 
+                  (deviceId == 0x0000A000) ||
+                  (deviceId == 0x0000A002) ||
+                  (deviceId == 0x0000A004);
+[13:46:13.625]        // -> [isMSP432P401R <= 0x00000001]
+[13:46:13.625]      isMSP432P4111 =
+                  (deviceId == 0x0000A010) ||
+                  (deviceId == 0x0000A020);
+[13:46:13.625]        // -> [isMSP432P4111 <= 0x00000000]
+[13:46:13.625]      isMSP432P411Y =
+                  (deviceId == 0x0000A012) ||
+                  (deviceId == 0x0000A022);
+[13:46:13.625]        // -> [isMSP432P411Y <= 0x00000000]
+[13:46:13.625]      isMSP432P411V =
+                  (deviceId == 0x0000A016) ||
+                  (deviceId == 0x0000A026);
+[13:46:13.625]        // -> [isMSP432P411V <= 0x00000000]
+[13:46:13.625]      isMSP432P4011 =
+                  (deviceId == 0x0000A019) ||
+                  (deviceId == 0x0000A029);
+[13:46:13.626]        // -> [isMSP432P4011 <= 0x00000000]
+[13:46:13.626]      isMSP432P401Y =
+                  (deviceId == 0x0000A01B) ||
+                  (deviceId == 0x0000A02B);
+[13:46:13.626]        // -> [isMSP432P401Y <= 0x00000000]
+[13:46:13.626]      isMSP432P401V =
+                  (deviceId == 0x0000A01F) ||
+                  (deviceId == 0x0000A02F);  
+[13:46:13.626]        // -> [isMSP432P401V <= 0x00000000]
+[13:46:13.626]      isMSP432P4xx_FLCTL = isMSP432P401M || isMSP432P401R;
+[13:46:13.626]        // -> [isMSP432P4xx_FLCTL <= 0x00000001]
+[13:46:13.626]      isMSP432P4xx_FLCTL_A = isMSP432P4111 || isMSP432P411Y || isMSP432P411V || isMSP432P4011 || isMSP432P401Y || isMSP432P401V;
+[13:46:13.626]        // -> [isMSP432P4xx_FLCTL_A <= 0x00000000]
+[13:46:13.626]      isMSP432P4xx_FLCTL_Production= isMSP432P4xx_FLCTL&&
+                  (
+                    (hwRevision >= 0x00000043) &&
+                    (hwRevision <= 0x00000049)
+                  );
+[13:46:13.626]        // -> [isMSP432P4xx_FLCTL_Production <= 0x00000001]
+[13:46:13.626]    </block>
+[13:46:13.626]    <control if="!isMSP432P4xx_FLCTL_Production && !isMSP432P4xx_FLCTL_A" while="" timeout="0" info="">
+[13:46:13.626]      // if-block "!isMSP432P4xx_FLCTL_Production && !isMSP432P4xx_FLCTL_A"
+[13:46:13.626]        // =>  FALSE
+[13:46:13.626]      // skip if-block "!isMSP432P4xx_FLCTL_Production && !isMSP432P4xx_FLCTL_A"
+[13:46:13.626]    </control>
+[13:46:13.626]  </sequence>
+[13:46:13.626]  

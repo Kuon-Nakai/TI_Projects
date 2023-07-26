@@ -240,6 +240,7 @@ void SystemCoreClockUpdate(void)
         }
         break;
     }
+	return;
 }
 
 /**

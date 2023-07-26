@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>7</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -502,11 +502,6 @@
               <FileName>usart.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\sys\usart.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>usart.h</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\sys\inc\usart.h</FilePath>
             </File>
           </Files>
         </Group>

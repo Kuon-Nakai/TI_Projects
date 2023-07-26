@@ -1,0 +1,7 @@
+build-idx:
+  csolution: TestSln.csolution.yaml
+  cprojects:
+    - cproject: TestProj.cproject.yaml
+  cbuilds:
+    - cbuild: TestProj.Debug+Board.cbuild.yml
+    - cbuild: TestProj.Release+Board.cbuild.yml

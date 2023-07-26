@@ -1,0 +1,26 @@
+build:
+  solution: TestSln.csolution.yaml
+  project: TestProj.cproject.yaml
+  context: TestProj.Debug+Board
+  compiler: AC6
+  board: TexasInstruments::MSP-EXP432P401R
+  device: MSP432P401R
+  processor:
+    fpu: on
+    endian: little
+    trustzone: non-secure
+  packs:
+    - pack: TexasInstruments::MSP432P4xx_DFP@3.2.6
+      path: ${CMSIS_PACK_ROOT}/TexasInstruments/MSP432P4xx_DFP/3.2.6
+  define:
+    - __MSP432P401R__
+  add-path:
+    - ${CMSIS_PACK_ROOT}/TexasInstruments/MSP432P4xx_DFP/3.2.6/Device/Include
+  output-type: exe
+  output-dirs:
+    intdir: tmp/TestProj/Board/Debug
+    outdir: out/TestProj/Board/Debug
+    rtedir: RTE
+  constructed-files:
+    - file: RTE/_Debug_Board/RTE_Components.h
+      category: header

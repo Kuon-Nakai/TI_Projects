@@ -1,0 +1,13 @@
+solution:
+  projects:
+    - project: ./TestProj.cproject.yaml
+  target-types:
+    - type: Board
+      board: TexasInstruments::MSP-EXP432P401R
+  build-types:
+    - type: Debug
+      compiler: AC6
+    - type: Release
+      compiler: AC6
+  packs:
+    - pack: TexasInstruments::MSP432P4xx_DFP@3.2.6

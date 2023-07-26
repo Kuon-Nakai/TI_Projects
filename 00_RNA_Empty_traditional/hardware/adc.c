@@ -74,7 +74,7 @@ void ADC_Config(void)
 
 void ADC14_IRQHandler(void)
 {
-    uint8_t i = 0;
+//    uint8_t i = 0;
     uint_fast64_t status = MAP_ADC14_getEnabledInterruptStatus();
     MAP_ADC14_clearInterruptFlag(status);
 	
