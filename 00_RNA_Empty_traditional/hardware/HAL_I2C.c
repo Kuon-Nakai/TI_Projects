@@ -112,7 +112,7 @@ void I2C_M_Init(uint32_t module)
  * @return Register contents
  ******************************************************************************/
 
-int I2C_read16(uint32_t module, unsigned char writeByte)
+int I2C_read16(uint32_t module, uint16_t txInt, unsigned char writeByte)
 {
     int val = 0;
     int valScratch = 0;
@@ -121,7 +121,7 @@ int I2C_read16(uint32_t module, unsigned char writeByte)
     I2C_setMode(module, EUSCI_B_I2C_TRANSMIT_MODE);
 
     /* Clear any existing interrupt flag PL */
-    I2C_clearInterruptFlag(module, EUSCI_B_I2C_TRANSMIT_INTERRUPT0);
+    I2C_clearInterruptFlag(module, txInt);
 
     /* Wait until ready to write PL */
     while (I2C_isBusBusy(module));
@@ -131,7 +131,7 @@ int I2C_read16(uint32_t module, unsigned char writeByte)
 
     /* Wait for TX to finish */
     while(!(I2C_getInterruptStatus(module,
-        EUSCI_B_I2C_TRANSMIT_INTERRUPT0)));
+        txInt)));
 
     /* Initiate stop only */
     I2C_masterSendMultiByteStop(module);
@@ -147,7 +147,7 @@ int I2C_read16(uint32_t module, unsigned char writeByte)
     I2C_masterReceiveStart(module);
 
     /* Wait for RX buffer to fill */
-    while(!(I2C_getInterruptStatus(module, EUSCI_B_I2C_RECEIVE_INTERRUPT0)));
+    while(!(I2C_getInterruptStatus(module, txInt)));
 
     /* Read from I2C RX register */
     val = I2C_masterReceiveMultiByteNext(module);
@@ -172,13 +172,13 @@ int I2C_read16(uint32_t module, unsigned char writeByte)
  * @param  writeByte Data to be written to the specified register
  * @return none
  ******************************************************************************/
-void I2C_write16(uint32_t module, unsigned char regAddr, unsigned int writeByte)
+void I2C_write16(uint32_t module, uint16_t txInt, unsigned char regAddr, unsigned int writeByte)
 {
     /* Set master to transmit mode PL */
     I2C_setMode(module, EUSCI_B_I2C_TRANSMIT_MODE);
 
     /* Clear any existing interrupt flag PL */
-    I2C_clearInterruptFlag(module, EUSCI_B_I2C_TRANSMIT_INTERRUPT0);
+    I2C_clearInterruptFlag(module, txInt);
 
     /* Wait until ready to write PL */
     while (I2C_isBusBusy(module));
@@ -191,6 +191,90 @@ void I2C_write16(uint32_t module, unsigned char regAddr, unsigned int writeByte)
     I2C_masterSendMultiByteFinish(module, (unsigned char)(writeByte&0xFF));
 }
 
+/**
+ * @brief Write data of arbitary size to a slave device.
+ *
+ * @param module    I2C module to be configured. [ EUSCI_Bx_BASE ]
+ * @param txInt     Interrupt to be used for TX. [ EUSCI_B_I2C_TRANSMIT_INTERRUPTx ] where x is 0 through 3.
+ * @param addr      Slave reg address.
+ * @param buf       Pointer to the data source buffer.
+ * @param size      Size of the data to be written in bytes.
+ */
+void I2C_Write(uint32_t module, uint16_t txInt, uint8_t addr, uint8_t *buf, uint16_t size) {
+    /* Set master to transmit mode PL */
+    I2C_setMode(module, EUSCI_B_I2C_TRANSMIT_MODE);
+
+    /* Clear any existing interrupt flag PL */
+    I2C_clearInterruptFlag(module, txInt);
+
+    /* Wait until ready to write PL */
+    while (I2C_isBusBusy(module));
+
+    /* Initiate start and send first character */
+    I2C_masterSendMultiByteStart(module, addr);
+    while(--size)
+        I2C_masterSendMultiByteNext(module, *(buf++));
+    I2C_masterSendMultiByteFinish(module, *((uint8_t *)buf + size));
+}
+
+/**
+ * @brief Read data of arbitary size from a slave device.
+ * 
+ * @param module    I2C module to be configured. [ EUSCI_Bx_BASE ]
+ * @param txInt     Interrupt to be used for TX. [ EUSCI_B_I2C_TRANSMIT_INTERRUPTx ] where x is 0 through 3.
+ * @param addr      Slave reg address.
+ * @param buf       Pointer to the data destination buffer.
+ * @param size      Size of the data to be read in bytes.
+ */
+void I2C_Read(uint32_t module, uint16_t txInt, uint8_t addr, uint8_t *buf, uint16_t size) {
+    /* Set master to transmit mode PL */
+    I2C_setMode(module, EUSCI_B_I2C_TRANSMIT_MODE);
+
+    /* Clear any existing interrupt flag PL */
+    I2C_clearInterruptFlag(module, txInt);
+
+    /* Wait until ready to write PL */
+    while (I2C_isBusBusy(module))
+        ;
+
+    /* Initiate start and send first character */
+    I2C_masterSendMultiByteStart(module, addr);
+
+    /* Wait for TX to finish */
+    while (!(I2C_getInterruptStatus(module,
+                                    txInt)))
+        ;
+
+    /* Initiate stop only */
+    I2C_masterSendMultiByteStop(module);
+
+    /* Wait for Stop to finish */
+    while (!I2C_getInterruptStatus(module, EUSCI_B_I2C_STOP_INTERRUPT))
+        ;
+
+    /*
+     * Generate Start condition and set it to receive mode.
+     * This sends out the slave address and continues to read
+     * until you issue a STOP
+     */
+    I2C_masterReceiveStart(module);
+
+    /* Wait for RX buffer to fill */
+    while (!(I2C_getInterruptStatus(module, txInt)));
+
+    while(--size)
+        *(buf++) = I2C_masterReceiveMultiByteNext(module);
+    
+    /* Receive last byte then send STOP condition */
+    *(uint8_t *)buf = I2C_masterReceiveMultiByteFinish(module);
+}
+
+/**
+ * @brief Sets the slave address for the I2C module.
+ * 
+ * @param module    I2C module to be configured. [ EUSCI_Bx_BASE ]
+ * @param slaveAdr  Slave device address to be set.
+ */
 void I2C_setslave(uint32_t module, unsigned int slaveAdr)
 {
     /* Specify slave address for I2C */

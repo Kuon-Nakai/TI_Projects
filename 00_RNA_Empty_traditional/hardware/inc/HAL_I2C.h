@@ -40,9 +40,11 @@
 #define __HAL_I2C_H_
 
 void Init_I2C_GPIO(void);
-void I2C_init(void);
-int I2C_read16(uint32_t module, unsigned char writeByte);
-void I2C_write16(uint32_t module, unsigned char regAddr, unsigned int writeByte);
+void I2C_M_init(uint32_t module);
+int I2C_read16(uint32_t module, uint16_t txInt, unsigned char writeByte);
+void I2C_write16(uint32_t module, uint16_t txInt, unsigned char regAddr, unsigned int writeByte);
 void I2C_setslave(uint32_t module, unsigned int slaveAdr);
+void I2C_Write(uint32_t module, uint16_t txInt, uint8_t addr, uint8_t *buf, uint16_t size);
+void I2C_Read(uint32_t module, uint16_t txInt, uint8_t addr, uint8_t *buf, uint16_t size);
 
 #endif /* __HAL_I2C_H_ */

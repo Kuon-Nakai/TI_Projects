@@ -37,6 +37,7 @@
 #ifndef DRIVER_MPU6050_INTERFACE_H
 #define DRIVER_MPU6050_INTERFACE_H
 
+#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include "driver_mpu6050.h"
 
 #ifdef __cplusplus

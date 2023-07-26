@@ -478,6 +478,31 @@
               <FileType>5</FileType>
               <FilePath>..\..\hardware\inc\GPIO_Setup.h</FilePath>
             </File>
+            <File>
+              <FileName>driver_mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_basic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_basic.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_dmp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_dmp.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_interface.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

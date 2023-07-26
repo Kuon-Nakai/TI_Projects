@@ -34,7 +34,10 @@
  * </table>
  */
 
+#include <stdarg.h>
 #include "driver_mpu6050_interface.h"
+#include "HAL_I2C.h"
+#include "delay.h"
 
 /**
  * @brief  interface iic bus init
@@ -45,6 +48,7 @@
  */
 uint8_t mpu6050_interface_iic_init(void)
 {
+    I2C_M_init(EUSCI_B0_BASE);
     return 0;
 }
 
@@ -73,6 +77,8 @@ uint8_t mpu6050_interface_iic_deinit(void)
  */
 uint8_t mpu6050_interface_iic_read(uint8_t addr, uint8_t reg, uint8_t *buf, uint16_t len)
 {
+    I2C_setslave(EUSCI_B0_BASE, addr);
+    I2C_Read(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_INTERRUPT0, reg, buf, len);
     return 0;
 }
 
@@ -89,6 +95,8 @@ uint8_t mpu6050_interface_iic_read(uint8_t addr, uint8_t reg, uint8_t *buf, uint
  */
 uint8_t mpu6050_interface_iic_write(uint8_t addr, uint8_t reg, uint8_t *buf, uint16_t len)
 {
+    I2C_setslave(EUSCI_B0_BASE, addr);
+    I2C_Write(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_INTERRUPT0, reg, buf, len);
     return 0;
 }
 
@@ -99,7 +107,7 @@ uint8_t mpu6050_interface_iic_write(uint8_t addr, uint8_t reg, uint8_t *buf, uin
  */
 void mpu6050_interface_delay_ms(uint32_t ms)
 {
-
+    delay_ms(ms);
 }
 
 /**
@@ -109,7 +117,12 @@ void mpu6050_interface_delay_ms(uint32_t ms)
  */
 void mpu6050_interface_debug_print(const char *const fmt, ...)
 {
-
+    char buf[256];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+    printf("%s", buf);
 }
 
 /**
