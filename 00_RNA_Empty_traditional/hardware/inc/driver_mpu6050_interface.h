@@ -39,6 +39,7 @@
 
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include "driver_mpu6050.h"
+#include "HAL_I2C.h"
 
 #ifdef __cplusplus
 extern "C"{

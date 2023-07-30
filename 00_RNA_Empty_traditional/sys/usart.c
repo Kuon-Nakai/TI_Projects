@@ -57,6 +57,12 @@
 #include <string.h>
 #include <stdarg.h>
 
+#if defined(__GNUC__) // AC6
+#pragma clang diagnostic ignored "-Wpointer-sign"
+#elif defined(__CC_ARM) // AC5
+// idk yet
+#endif
+
 #ifdef __TI_COMPILER_VERSION__
 //CCS平台
 uint8_t  USART0_TX_BUF[USART0_MAX_SEND_LEN];             //发送缓冲,最大USART3_MAX_SEND_LEN字节
@@ -260,7 +266,7 @@ UART_RxCtrl rc_a3;
  * 
  * @note Calling rxHandler() is required in the ISR override to make this function work.
  */
-void uart_RxLine(UART_RxCtrl *rc, void (*callback)(uint8_t *data, uint8_t len), bool autoExpand)
+void uart_RxLine(UART_RxCtrl *rc, void (*callback)(char *data, uint8_t len), bool autoExpand)
 {
   rc->rxCallback = callback;
   rc->rxCnt = 0;
@@ -309,7 +315,7 @@ inline void rxHandler(UART_RxCtrl *rc, uint8_t data){
     // Rx complete
     rc->rxCplt = 1;
     rc->rxBuf[rc->rxCnt++] = 0;
-    rc->rxCallback(rc->rxBuf, --(rc->rxCnt));
+    rc->rxCallback((char *)(rc->rxBuf), --(rc->rxCnt));
     return;
   }
   rc->rxBuf[rc->rxCnt++] = data;
@@ -362,10 +368,14 @@ inline void uart_RxReload(UART_RxCtrl *rc)
  * 
  * @note          The EUSCI_A0 is used exclusively for debugging, and can transmit data by using printf() function.
  */
-void tx(uint32_t module, char *fmt, ...) {
+void uart_Txf(uint32_t module, char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   char *buf = (char *)malloc(64);
+  if(buf == NULL) {
+    printf("ERR> UART Tx buffer allocation failed. Aborting transmission.\n");
+    return;
+  }
   int r = vsnprintf(buf, 64, fmt, ap);
   if(r == -1) {
     printf("ERR> UART Tx buffer write failed. Aborting transmission.\n");

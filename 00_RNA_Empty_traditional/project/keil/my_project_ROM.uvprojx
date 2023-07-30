@@ -503,6 +503,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\hardware\driver_mpu6050_interface.c</FilePath>
             </File>
+            <File>
+              <FileName>UART_Screen.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\UART_Screen.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\cmd.c</FilePath>
+            </File>
+            <File>
+              <FileName>ArrUtils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\ArrUtils.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

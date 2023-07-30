@@ -36,7 +36,6 @@
 
 #include <stdarg.h>
 #include "driver_mpu6050_interface.h"
-#include "HAL_I2C.h"
 #include "delay.h"
 
 /**
@@ -48,7 +47,7 @@
  */
 uint8_t mpu6050_interface_iic_init(void)
 {
-    I2C_M_init(EUSCI_B0_BASE);
+    // I2C_M_init(EUSCI_B0_BASE);
     return 0;
 }
 

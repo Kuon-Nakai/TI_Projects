@@ -28,6 +28,7 @@
 #define ENABLE_CMD_ECHO     0
 #define ENABLE_SERVO2_CMD   1
 #define ENABLE_PID_CMD      1
+#define ENABLE_SYS_CMD      1
 
 extern UART_RxCtrl rc_a0;
 
@@ -38,7 +39,7 @@ PIDController *pidxv;
 PIDController *pidyv;
 char cmd[32];
 
-void cb(uint8_t *data, uint8_t len);
+void cb(char *data, uint8_t len);
 
 int main(void)
 {
@@ -86,7 +87,7 @@ void EUSCIA0_IRQHandler(){
 }
 
 // UART A0 Rx callback for command processing
-void cb(uint8_t *data, uint8_t len)
+void cb(char *data, uint8_t len)
 {
 #if ENABLE_CMD_ECHO
     printf("Received %d bytes: ", len);
@@ -132,6 +133,13 @@ void cb(uint8_t *data, uint8_t len)
             printf("Operation completed.\n");
         }
         else printf("PID command requires instance selection: pid <__: instance selection> <command> <value>\n");
+    }
+#endif
+#if ENABLE_SYS_CMD
+    else if(strncasecmp((char *)data, "heapstat", 8) == 0){
+        printf("Heap status:\n");
+        __heapstats((__heapprt)fprintf, stdout);
+        
     }
 #endif
     else printf("Unknown command: %s\n", data);
