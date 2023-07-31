@@ -8,6 +8,7 @@
 /****************************************************/
 
 #include "sysinit.h"
+#include "HAL_I2C.h"
 #include "usart.h"
 #include "delay.h"
 #include "led.h"
@@ -28,9 +29,12 @@
 #define ENABLE_CMD_ECHO     0
 #define ENABLE_SERVO2_CMD   1
 #define ENABLE_PID_CMD      1
-#define ENABLE_SYS_CMD      1
+#define ENABLE_SYS_CMD      0
+#define ENABLE_I2C_CMD      1
 
 extern UART_RxCtrl rc_a0;
+
+extern eUSCI_I2C_MasterConfig i2cConfig;
 
 ServoControl2 *sc;
 PIDController *pidx;
@@ -38,6 +42,8 @@ PIDController *pidy;
 PIDController *pidxv;
 PIDController *pidyv;
 char cmd[32];
+uint32_t I2C_DebugBase = 0x40002000; // UCB0 default
+uint32_t I2C_DebugInt;
 
 void cb(char *data, uint8_t len);
 
@@ -139,7 +145,61 @@ void cb(char *data, uint8_t len)
     else if(strncasecmp((char *)data, "heapstat", 8) == 0){
         printf("Heap status:\n");
         __heapstats((__heapprt)fprintf, stdout);
-        
+        // FIXME: Do NOT call this command. 
+    }
+#endif
+#if ENABLE_I2C_CMD
+    else if(strncasecmp((char *)data, "i2c ", 4) == 0){
+        if      (strncasecmp((char *)data + 4, "init ", 5) == 0) {
+            printf("Initializing I2C...");
+            int x = atoi((char *)data + 9);
+            I2C_DebugBase = 0x40002000 + 0x00000400c * x;
+            printf("Debug base<0x%X>...", I2C_DebugBase);
+            /* Initialize USCI_B0 and I2C Master to communicate with slave devices*/
+            I2C_initMaster(I2C_DebugBase, &i2cConfig);
+
+            /* Disable I2C module to make changes */
+            I2C_disableModule(I2C_DebugBase);
+
+            /* Enable I2C Module to start operations */
+            I2C_enableModule(I2C_DebugBase);
+            printf("I2C initialized.\n");
+            I2C_DebugInt = x ? (x == 1 ? EUSCI_B_I2C_TRANSMIT_INTERRUPT1 : (x == 2 ? EUSCI_B_I2C_TRANSMIT_INTERRUPT2 : EUSCI_B_I2C_TRANSMIT_INTERRUPT3))
+                : EUSCI_B_I2C_TRANSMIT_INTERRUPT0; // why am I even doing this...
+            printf("Please specify the slave address using: i2c addr <address>\n");
+        }
+        else if (strncasecmp((char *)data + 4, "addr 0x", 7) == 0) {
+            I2C_setslave(I2C_DebugBase, atoi((char *)data + 11));
+            printf("I2C slave address set to 0x%02X.\n", atoi((char *)data + 9));
+        }
+        else if (strncasecmp((char *)data + 4, "tx ", 3) == 0) {
+            int len = 0;
+            while(*(data + 7 + ++len) != ' ') ;
+            // Now len is the length of the first param.
+            *(data + 7 + len) = 0; // Split the string. Extracting the two params now.
+            uint8_t addr = atoi((char *)data + 7);
+            uint8_t size = atoi((char *)data + 7 + len + 1);
+            printf("I2C - 0x%02X[%d] >> %s", addr, size, (char *)data + 7 + len + 1);
+            I2C_Write(I2C_DebugBase, I2C_DebugInt, addr, (uint8_t *)(data + 7 + len + 1), size);
+            printf(" ...Done.\n");
+        }
+        else if (strncasecmp((char *)data + 4, "rx ", 3) == 0) {
+            int len = 0;
+            while(*(data + 7 + ++len) != ' ') ;
+            // Now len is the length of the first param.
+            *(data + 7 + len) = 0; // Split the string. Extracting the two params now.
+            uint8_t addr = atoi((char *)data + 7);
+            uint8_t size = atoi((char *)data + 7 + len + 1);
+            uint8_t *buf = malloc(size);
+            printf("I2C - 0x%02X[%d] << ", addr, size);
+            I2C_Read(I2C_DebugBase, I2C_DebugInt, addr, buf, size);
+            printf(" ...Done.\nRx_int:");
+            for(int i = 0; i < size; i++) printf(" %d", buf[i]);
+            printf("\nRx_hex:");
+            for(int i = 0; i < size; i++) printf(" %02X", buf[i]);
+            printf("\n");
+        }
+        else printf("Unknown I2C command: %s\n", data);
     }
 #endif
     else printf("Unknown command: %s\n", data);

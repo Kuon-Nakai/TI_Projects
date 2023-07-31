@@ -105,7 +105,7 @@ __asm(".global __use_no_semihosting \n\t");
 // {
 //   int handle;
 // };
-FILE __stdout;
+// FILE __stdout;
 //定义_sys_exit()以避免使用半主机模式
 void _sys_exit(int x)
 {

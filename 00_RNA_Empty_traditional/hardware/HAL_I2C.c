@@ -102,7 +102,7 @@ void I2C_M_Init(uint32_t module)
 
     /* Enable I2C Module to start operations */
     I2C_enableModule(module);
-    return;
+    
 }
 
 
