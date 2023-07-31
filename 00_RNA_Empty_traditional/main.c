@@ -19,18 +19,22 @@
 #include <stdlib.h>
 #include "servo.h"
 #include "PID.h"
+#include "shell.h"
+#include "ustdio.h"
+// #include "kernel.h"
 
 #if defined(__GNUC__)
 // #pragma clang diagnostic ignored 161
 #elif defined(__CC_ARM)
 #pragma diag_suppress 161 // Suppress the "unrecognized #pragma" warning, ignoring VSCode region tags for Keil. AC5 only.
+#pragma diag_suppress 167 // Argument type incompatibility warning during shell init.
 #endif
 
 #define ENABLE_CMD_ECHO     0
-#define ENABLE_SERVO2_CMD   1
-#define ENABLE_PID_CMD      1
+#define ENABLE_SERVO2_CMD   0
+#define ENABLE_PID_CMD      0
 #define ENABLE_SYS_CMD      0
-#define ENABLE_I2C_CMD      1
+#define ENABLE_I2C_CMD      0
 
 extern UART_RxCtrl rc_a0;
 
@@ -45,7 +49,12 @@ char cmd[32];
 uint32_t I2C_DebugBase = 0x40002000; // UCB0 default
 uint32_t I2C_DebugInt;
 
+char UCA0_RxBuf[128] = {0};
+uint16_t UCA0_RxCnt = 0;
+struct shell_input UCA0_ShInput;
+
 void cb(char *data, uint8_t len);
+void debug_puts(char *buf, uint16_t len);
 
 int main(void)
 {
@@ -55,7 +64,7 @@ int main(void)
     uart_init_IT(EUSCI_A0_BASE, 115200); // 第7讲 串口配置
     delay_init();      // 第4讲 滴答延时
 
-    uart_RxLine(&rc_a0, cb, true); // Configure debug probe UART, with auto buffer expansion
+    // uart_RxLine(&rc_a0, cb, true); // Configure debug probe UART, with auto buffer expansion
     /*开始填充初始化代码*/
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0); // P1.0 as GPIO output (red LED), def. 1
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
@@ -73,11 +82,25 @@ int main(void)
 
     printf("Hello,MSP432!\r\n");
     MAP_Interrupt_enableMaster(); // 开启总中断
+
+#pragma region Shell Initialization
+
+    shell_init("Debug> ", debug_puts);
+    shell_input_init(&UCA0_ShInput, debug_puts);
+
+    shell_register_command("reset", NVIC_SystemReset);
+
+#pragma endregion
+
     while (1)
     {
         /*开始填充用户代码*/
         GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        delay_ms(500);
+        if(UCA0_RxCnt) {
+            shell_input(&UCA0_ShInput, UCA0_RxBuf, UCA0_RxCnt);
+            UCA0_RxCnt = 0;
+            
+        }
         /*停止填充用户代码*/
     }
 }
@@ -85,16 +108,21 @@ int main(void)
 void EUSCIA0_IRQHandler(){
     uint32_t status = MAP_UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
     if(status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
-        uint8_t data = MAP_UART_receiveData(EUSCI_A0_BASE);
+        // uint8_t data = MAP_UART_receiveData(EUSCI_A0_BASE);
         // Handle incoming UART transmission
         // UART_transmitData(EUSCI_A0_BASE, data);ser
-        rxHandler(&rc_a0, data);
+        // rxHandler(&rc_a0, data);
+
+        UCA0_RxBuf[UCA0_RxCnt++] = MAP_UART_receiveData(EUSCI_A0_BASE);
     }
 }
 
 // UART A0 Rx callback for command processing
 void cb(char *data, uint8_t len)
 {
+
+
+
 #if ENABLE_CMD_ECHO
     printf("Received %d bytes: ", len);
     printf("%s\n", data);
@@ -205,3 +233,9 @@ void cb(char *data, uint8_t len)
     else printf("Unknown command: %s\n", data);
     uart_RxReload(&rc_a0);
 }
+
+void debug_puts(char *buf, uint16_t len) {
+    uart_Tx(EUSCI_A0_BASE, buf, len);
+}
+
+

@@ -390,12 +390,9 @@ void uart_Txf(uint32_t module, char *fmt, ...) {
     UART_transmitData(module, *buf++);
   }
 }
-    // void EUSCIA0_IRQHandler(void)
-    // {
-    //   uint32_t status = UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
 
-    //   if (status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG)
-    //   {
-    //     rxHandler(&rc_a0, MAP_UART_receiveData(EUSCI_A0_BASE));
-    //   }
-    // }
+void uart_Tx(uint32_t module, char *txt, uint16_t len) {
+  while(len--) {
+    UART_transmitData(module, *txt++);
+  }
+}

@@ -509,14 +509,39 @@
               <FilePath>..\..\hardware\UART_Screen.c</FilePath>
             </File>
             <File>
-              <FileName>cmd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hardware\cmd.c</FilePath>
-            </File>
-            <File>
               <FileName>ArrUtils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hardware\ArrUtils.c</FilePath>
+            </File>
+            <File>
+              <FileName>avltree.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\avltree.c</FilePath>
+            </File>
+            <File>
+              <FileName>getopt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\getopt.c</FilePath>
+            </File>
+            <File>
+              <FileName>heaplib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\heaplib.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\shell.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasklib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\tasklib.c</FilePath>
+            </File>
+            <File>
+              <FileName>ustdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\ustdio.c</FilePath>
             </File>
           </Files>
         </Group>

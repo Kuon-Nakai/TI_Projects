@@ -81,5 +81,6 @@ void rxHandler(UART_RxCtrl *rc, uint8_t data);
 void uart_RxLine(UART_RxCtrl *rc, void (*callback)(char *, uint8_t), bool);
 void uart_RxReload(UART_RxCtrl *rc);
 void uart_Txf(uint32_t module, char *fmt, ...);
+void uart_Tx(uint32_t module, char *txt, uint16_t len);
 
 #endif
