@@ -10,9 +10,9 @@
       <TargetName>my_project</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>6120000::V6.12::.\ARMCLANG</pArmCC>
-      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
-      <uAC6>1</uAC6>
+      <pArmCC>5060750::V5.06 update 6 (build 750)::ARMCC</pArmCC>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>MSP432P401R</Device>
@@ -189,7 +189,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>1</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>7</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -322,7 +322,7 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>3</wLevel>
+            <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
@@ -477,6 +477,71 @@
               <FileName>GPIO_Setup.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\hardware\inc\GPIO_Setup.h</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_basic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_basic.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_dmp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_dmp.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_mpu6050_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\driver_mpu6050_interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>UART_Screen.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\UART_Screen.c</FilePath>
+            </File>
+            <File>
+              <FileName>ArrUtils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\ArrUtils.c</FilePath>
+            </File>
+            <File>
+              <FileName>avltree.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\avltree.c</FilePath>
+            </File>
+            <File>
+              <FileName>getopt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\getopt.c</FilePath>
+            </File>
+            <File>
+              <FileName>heaplib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\heaplib.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\shell.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasklib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\tasklib.c</FilePath>
+            </File>
+            <File>
+              <FileName>ustdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\ustdio.c</FilePath>
             </File>
           </Files>
         </Group>

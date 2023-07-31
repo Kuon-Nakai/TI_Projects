@@ -72,13 +72,15 @@ typedef struct {
     uint16_t rxCnt;  // Buffer size for RX
     uint16_t bufSize;// Dynamic buffer size, set to 0 to use fixed size.
     bool rxCplt;     // Reception status
-    void (*rxCallback)(uint8_t *data, uint8_t len); // Callback for RX
+    void (*rxCallback)(char *data, uint8_t len); // Callback for RX
 } UART_RxCtrl;
 
 void uart_init(uint32_t UCA_Module, uint32_t baudRate);
 void uart_init_IT(uint32_t UCA_Module, uint32_t baudRate);
 void rxHandler(UART_RxCtrl *rc, uint8_t data);
-void uart_RxLine(UART_RxCtrl *rc, void (*callback)(uint8_t *, uint8_t), bool);
+void uart_RxLine(UART_RxCtrl *rc, void (*callback)(char *, uint8_t), bool);
 void uart_RxReload(UART_RxCtrl *rc);
+void uart_Txf(uint32_t module, char *fmt, ...);
+void uart_Tx(uint32_t module, char *txt, uint16_t len);
 
 #endif

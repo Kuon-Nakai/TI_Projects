@@ -8,6 +8,7 @@
 /****************************************************/
 
 #include "sysinit.h"
+#include "HAL_I2C.h"
 #include "usart.h"
 #include "delay.h"
 #include "led.h"
@@ -18,18 +19,26 @@
 #include <stdlib.h>
 #include "servo.h"
 #include "PID.h"
+#include "shell.h"
+#include "ustdio.h"
+// #include "kernel.h"
 
 #if defined(__GNUC__)
 // #pragma clang diagnostic ignored 161
 #elif defined(__CC_ARM)
 #pragma diag_suppress 161 // Suppress the "unrecognized #pragma" warning, ignoring VSCode region tags for Keil. AC5 only.
+#pragma diag_suppress 167 // Argument type incompatibility warning during shell init.
 #endif
 
 #define ENABLE_CMD_ECHO     0
-#define ENABLE_SERVO2_CMD   1
-#define ENABLE_PID_CMD      1
+#define ENABLE_SERVO2_CMD   0
+#define ENABLE_PID_CMD      0
+#define ENABLE_SYS_CMD      0
+#define ENABLE_I2C_CMD      0
 
 extern UART_RxCtrl rc_a0;
+
+extern eUSCI_I2C_MasterConfig i2cConfig;
 
 ServoControl2 *sc;
 PIDController *pidx;
@@ -37,8 +46,15 @@ PIDController *pidy;
 PIDController *pidxv;
 PIDController *pidyv;
 char cmd[32];
+uint32_t I2C_DebugBase = 0x40002000; // UCB0 default
+uint32_t I2C_DebugInt;
 
-void cb(uint8_t *data, uint8_t len);
+char UCA0_RxBuf[128] = {0};
+uint16_t UCA0_RxCnt = 0;
+struct shell_input UCA0_ShInput;
+
+void cb(char *data, uint8_t len);
+void debug_puts(char *buf, uint16_t len);
 
 int main(void)
 {
@@ -48,7 +64,7 @@ int main(void)
     uart_init_IT(EUSCI_A0_BASE, 115200); // 第7讲 串口配置
     delay_init();      // 第4讲 滴答延时
 
-    uart_RxLine(&rc_a0, cb, true); // Configure debug probe UART, with auto buffer expansion
+    // uart_RxLine(&rc_a0, cb, true); // Configure debug probe UART, with auto buffer expansion
     /*开始填充初始化代码*/
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0); // P1.0 as GPIO output (red LED), def. 1
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
@@ -66,11 +82,25 @@ int main(void)
 
     printf("Hello,MSP432!\r\n");
     MAP_Interrupt_enableMaster(); // 开启总中断
+
+#pragma region Shell Initialization
+
+    shell_init("Debug> ", debug_puts);
+    shell_input_init(&UCA0_ShInput, debug_puts);
+
+    shell_register_command("reset", NVIC_SystemReset);
+
+#pragma endregion
+
     while (1)
     {
         /*开始填充用户代码*/
         GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        delay_ms(500);
+        if(UCA0_RxCnt) {
+            shell_input(&UCA0_ShInput, UCA0_RxBuf, UCA0_RxCnt);
+            UCA0_RxCnt = 0;
+            
+        }
         /*停止填充用户代码*/
     }
 }
@@ -78,16 +108,21 @@ int main(void)
 void EUSCIA0_IRQHandler(){
     uint32_t status = MAP_UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
     if(status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
-        uint8_t data = MAP_UART_receiveData(EUSCI_A0_BASE);
+        // uint8_t data = MAP_UART_receiveData(EUSCI_A0_BASE);
         // Handle incoming UART transmission
         // UART_transmitData(EUSCI_A0_BASE, data);ser
-        rxHandler(&rc_a0, data);
+        // rxHandler(&rc_a0, data);
+
+        UCA0_RxBuf[UCA0_RxCnt++] = MAP_UART_receiveData(EUSCI_A0_BASE);
     }
 }
 
 // UART A0 Rx callback for command processing
-void cb(uint8_t *data, uint8_t len)
+void cb(char *data, uint8_t len)
 {
+
+
+
 #if ENABLE_CMD_ECHO
     printf("Received %d bytes: ", len);
     printf("%s\n", data);
@@ -134,6 +169,73 @@ void cb(uint8_t *data, uint8_t len)
         else printf("PID command requires instance selection: pid <__: instance selection> <command> <value>\n");
     }
 #endif
+#if ENABLE_SYS_CMD
+    else if(strncasecmp((char *)data, "heapstat", 8) == 0){
+        printf("Heap status:\n");
+        __heapstats((__heapprt)fprintf, stdout);
+        // FIXME: Do NOT call this command. 
+    }
+#endif
+#if ENABLE_I2C_CMD
+    else if(strncasecmp((char *)data, "i2c ", 4) == 0){
+        if      (strncasecmp((char *)data + 4, "init ", 5) == 0) {
+            printf("Initializing I2C...");
+            int x = atoi((char *)data + 9);
+            I2C_DebugBase = 0x40002000 + 0x00000400c * x;
+            printf("Debug base<0x%X>...", I2C_DebugBase);
+            /* Initialize USCI_B0 and I2C Master to communicate with slave devices*/
+            I2C_initMaster(I2C_DebugBase, &i2cConfig);
+
+            /* Disable I2C module to make changes */
+            I2C_disableModule(I2C_DebugBase);
+
+            /* Enable I2C Module to start operations */
+            I2C_enableModule(I2C_DebugBase);
+            printf("I2C initialized.\n");
+            I2C_DebugInt = x ? (x == 1 ? EUSCI_B_I2C_TRANSMIT_INTERRUPT1 : (x == 2 ? EUSCI_B_I2C_TRANSMIT_INTERRUPT2 : EUSCI_B_I2C_TRANSMIT_INTERRUPT3))
+                : EUSCI_B_I2C_TRANSMIT_INTERRUPT0; // why am I even doing this...
+            printf("Please specify the slave address using: i2c addr <address>\n");
+        }
+        else if (strncasecmp((char *)data + 4, "addr 0x", 7) == 0) {
+            I2C_setslave(I2C_DebugBase, atoi((char *)data + 11));
+            printf("I2C slave address set to 0x%02X.\n", atoi((char *)data + 9));
+        }
+        else if (strncasecmp((char *)data + 4, "tx ", 3) == 0) {
+            int len = 0;
+            while(*(data + 7 + ++len) != ' ') ;
+            // Now len is the length of the first param.
+            *(data + 7 + len) = 0; // Split the string. Extracting the two params now.
+            uint8_t addr = atoi((char *)data + 7);
+            uint8_t size = atoi((char *)data + 7 + len + 1);
+            printf("I2C - 0x%02X[%d] >> %s", addr, size, (char *)data + 7 + len + 1);
+            I2C_Write(I2C_DebugBase, I2C_DebugInt, addr, (uint8_t *)(data + 7 + len + 1), size);
+            printf(" ...Done.\n");
+        }
+        else if (strncasecmp((char *)data + 4, "rx ", 3) == 0) {
+            int len = 0;
+            while(*(data + 7 + ++len) != ' ') ;
+            // Now len is the length of the first param.
+            *(data + 7 + len) = 0; // Split the string. Extracting the two params now.
+            uint8_t addr = atoi((char *)data + 7);
+            uint8_t size = atoi((char *)data + 7 + len + 1);
+            uint8_t *buf = malloc(size);
+            printf("I2C - 0x%02X[%d] << ", addr, size);
+            I2C_Read(I2C_DebugBase, I2C_DebugInt, addr, buf, size);
+            printf(" ...Done.\nRx_int:");
+            for(int i = 0; i < size; i++) printf(" %d", buf[i]);
+            printf("\nRx_hex:");
+            for(int i = 0; i < size; i++) printf(" %02X", buf[i]);
+            printf("\n");
+        }
+        else printf("Unknown I2C command: %s\n", data);
+    }
+#endif
     else printf("Unknown command: %s\n", data);
     uart_RxReload(&rc_a0);
 }
+
+void debug_puts(char *buf, uint16_t len) {
+    uart_Tx(EUSCI_A0_BASE, buf, len);
+}
+
+

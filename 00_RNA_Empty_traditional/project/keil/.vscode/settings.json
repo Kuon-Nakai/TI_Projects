@@ -2,7 +2,13 @@
     "files.associations": {
         "string": "c",
         "driverlib.h": "c",
-        "pid.h": "c"
+        "pid.h": "c",
+        "driver_mpu6050_interface.h": "c",
+        "driver_mpu6050_basic.h": "c",
+        "arrutils.h": "c",
+        "usart.h": "c",
+        "uart_screen.h": "c",
+        "hal_i2c.h": "c"
     },
     "C_Cpp.default.defines": [
         "__MSP432P401R__",
